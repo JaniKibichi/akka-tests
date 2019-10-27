@@ -1,15 +1,21 @@
 package com.janikibichi.routes
 
-import akka.http.scaladsl.model.{ContentTypes, HttpEntity, StatusCodes}
+import akka.http.scaladsl.model.{ContentTypes, HttpEntity, HttpResponse, StatusCodes}
 import akka.http.scaladsl.server
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
-import com.janikibichi.repository.Messages.{AkkaHttpRestServer, Donut}
+import com.janikibichi.repository.DonutDao
+import com.janikibichi.repository.Messages.{AkkaHttpRestServer, Donut, Ingredient}
 import com.janikibichi.routes.marshalling.WebJSONSupport
 import com.typesafe.scalalogging.LazyLogging
 
+import scala.util.{Failure, Success}
+
 trait Routes extends LazyLogging with WebJSONSupport{
-  val routes: Route = home ~ termsAndConditions ~ serverVersion ~ routeAsJson ~ routeAsJsonEncoding ~ createDonut
+  val routes: Route = home ~ termsAndConditions ~ serverVersion ~ routeAsJson ~ routeAsJsonEncoding ~ createDonut ~
+                      listDonuts ~ listOrFailDonuts ~ donutListWithTryHttpResponse ~ userProvidedDonutName ~
+                      checkDonutThroughRegex ~ passQueryParameters ~ optionalParameters ~ typedQueryParameters ~
+                      csvQueryParameters ~ ingredientsToCaseClass ~ inspectRequestHeaders ~ multipleSegments
 
   def home:server.Route ={
     path(""){
@@ -75,12 +81,165 @@ trait Routes extends LazyLogging with WebJSONSupport{
 
   def createDonut:server.Route ={
     path("create-donut") {
+
       post{
         entity(as[Donut]) { donut =>
           logger.info(s"Creating donut = $donut")
           complete(StatusCodes.Created,s"Created donut = $donut")
         }
+      }~ delete {
+        complete(StatusCodes.MethodNotAllowed, "The HTTP DELETE operation is not allowed for the create-donut path.")
+      }
+
+    }
+  }
+
+  def listDonuts:server.Route ={
+    path("donuts"){
+      get{
+        onSuccess(DonutDao.fetchDonuts){ donuts =>
+          complete(StatusCodes.OK,donuts)
+        }
       }
     }
   }
+
+  def listOrFailDonuts:server.Route ={
+    path("donuts-with-future-success-failure"){
+      get{
+        onComplete(DonutDao.fetchDonuts){
+          case Success(donuts) => complete(StatusCodes.OK,donuts)
+          case Failure(exception) => complete(s"Failed to fetch donuts = {${exception.getMessage}}")
+        }
+      }
+    }
+  }
+
+  def completeWithHttpResponse:server.Route ={
+    path("complete-with-http-response"){
+      get{
+        complete(HttpResponse(status = StatusCodes.OK,entity = "Response Entity Object"))
+      }
+    }
+  }
+
+  def donutListWithTryHttpResponse:server.Route={
+    path("donut-with-try-http-response"){
+      get{
+        val result: HttpResponse = DonutDao.tryFetchDonuts.getOrElse(DonutDao.defaultResponse)
+        complete(result)
+      }
+    }
+  }
+
+  def serveErrorPage:server.Route ={
+    path("akka-http-get-resource"){
+      getFromResource("error-page.html")
+    }
+  }
+
+  def userProvidedDonutName:server.Route ={
+    path("donuts"/Segment){ donutName =>
+      get{
+        val result = DonutDao.donutDetails(donutName)
+        onComplete(result){
+          case Success(donutDetail) => complete(StatusCodes.OK,donutDetail)
+          case Failure(exception) => complete(s"Failed to fetch donut details = {${exception.getMessage}}")
+        }
+      }
+    }
+  }
+
+  def checkDonutThroughRegex:server.Route ={
+    path("donuts"/"stock"/new scala.util.matching.Regex("""donut_[a-zA-Z0-9\-]*""")) { donutId =>
+      get{
+        complete(StatusCodes.OK,s"Looking up donut stock by donutId =$donutId")
+      }
+    }
+  }
+
+  def passQueryParameters:server.Route={
+    path("donut"/"prices"){
+      get{
+        parameter("donutName") { donutName =>
+          val output = s"Received parameter: donutName=$donutName"
+          complete(StatusCodes.OK, output)
+        }
+      }
+    }
+  }
+
+  def optionalParameters:server.Route ={
+    path("donut"/"bake"){
+      get{
+        parameters('donutName, 'topping ? "sprinkles"){ (donutName,topping) =>
+          val output = s"Received parameters: donutName=$donutName and topping=$topping"
+          complete(StatusCodes.OK,output)
+        }
+      }
+    }
+  }
+
+  def typedQueryParameters:server.Route ={
+    path("ingredients"){
+      get{
+        parameters('donutName.as[String],'priceLevel.as[Double]){ (donutName, priceLevel) =>
+          val output = s"Received parameters: donutName=$donutName, priceLevel=$priceLevel"
+          complete(StatusCodes.OK,output)
+        }
+      }
+    }
+  }
+
+  def csvQueryParameters:server.Route ={
+    path("bake-donuts"){
+      get{
+        import akka.http.scaladsl.unmarshalling.PredefinedFromStringUnmarshallers.CsvSeq
+        parameter('ingredients.as(CsvSeq[String])){ ingredients =>
+          val output = s"Received CSV parameter: ingredients=$ingredients"
+          complete(StatusCodes.OK, output)
+        }
+      }
+    }
+  }
+
+  def ingredientsToCaseClass:server.Route={
+    path("ingredients-to-case-class"){
+      get{
+        parameters('donutName.as[String],'priceLevel.as[Double]).as(Ingredient){ ingredients =>
+          val output = s"Encoded query parameters into case class, ingredient: $ingredients"
+          complete(StatusCodes.OK,output)
+
+        }
+      }
+    }
+  }
+
+  def inspectRequestHeaders:server.Route={
+    path("request-with-headers"){
+      get{
+        extractRequest{ httpRequest =>
+          val headers = httpRequest.headers.mkString(", ")
+          complete(StatusCodes.OK,s"headers = $headers")
+        }
+      }
+    }
+  }
+
+  def multipleSegments:server.Route={
+    path("multiple-segments"/Segments){ segments =>
+      get{
+        val partA :: partB :: partC :: Nil = segments
+        val output =
+          s"""
+            |Received the following Segments=$segments, with
+            |partA = $partA
+            |partB = $partB
+            |partC = $partC
+          """.stripMargin
+        complete(StatusCodes.OK,output)
+      }
+    }
+  }
+
 }
