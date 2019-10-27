@@ -1,0 +1,6 @@
+[0m[[0m[0minfo[0m] [0m[0m[32mDonutInfoActorSpec:[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mDonutInfoActor[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should reply back with true when it receives Tell Pattern Info(vanilla) message[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should respond back within 100 milliseconds[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should reply back with false when it receives an Ask Pattern Info(plain) message[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should throw an IllegalStateException when it gets a random message[0m[0m

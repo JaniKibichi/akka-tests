@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="sbt: io.projectreactor:reactor-core:3.2.8.RELEASE:jar">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../.ivy2/cache/io.projectreactor/reactor-core/jars/reactor-core-3.2.8.RELEASE.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/../.ivy2/cache/io.projectreactor/reactor-core/srcs/reactor-core-3.2.8.RELEASE-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

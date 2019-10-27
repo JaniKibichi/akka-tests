@@ -1,0 +1,6 @@
+[0m[[0m[0minfo[0m] [0m[0m[32mDonutActorFSMSpec:[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mDonutBakingActor[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should have an initial state of BakingStates.Stop[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should process BakeDonut event and switch to the BakingStates.Start state[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should process StopBaking event and switch to BakingStates.Stop state[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should have a current donut quantity equal to one after the StopBaking event[0m[0m

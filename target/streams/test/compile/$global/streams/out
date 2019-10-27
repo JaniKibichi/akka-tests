@@ -1,0 +1,8 @@
+[0m[[0m[31merror[0m] [0m[0m/home/grahamingokho/akka-test/src/test/scala/com/janikibichi/models/DonutInfoActorSpec.scala:11:7: class DonutInfoActorSpec inherits conflicting members:[0m
+[0m[[0m[31merror[0m] [0m[0m  method convertSymbolToHavePropertyMatcherGenerator in trait Matchers of type (symbol: Symbol)(implicit prettifier: org.scalactic.Prettifier, implicit pos: org.scalactic.source.Position)DonutInfoActorSpec.this.HavePropertyMatcherGenerator  and[0m
+[0m[[0m[31merror[0m] [0m[0m  method convertSymbolToHavePropertyMatcherGenerator in trait MustMatchers of type (symbol: Symbol)(implicit prettifier: org.scalactic.Prettifier, implicit pos: org.scalactic.source.Position)DonutInfoActorSpec.this.HavePropertyMatcherGenerator[0m
+[0m[[0m[31merror[0m] [0m[0m(Note: this can be resolved by declaring an override in class DonutInfoActorSpec.);[0m
+[0m[[0m[31merror[0m] [0m[0m other members with override errors are: equal, key, value, a, an, theSameInstanceAs, regex, <, >, <=, >=, definedAt, oneOf, oneElementOf, atLeastOneOf, atLeastOneElementOf, noneOf, noElementsOf, theSameElementsAs, theSameElementsInOrderAs, only, inOrderOnly, allOf, allElementsOf, inOrder, inOrderElementsOf, atMostOneOf, atMostOneElementOf, thrownBy, message, all, atLeast, every, exactly, no, between, atMost, the, convertToRegexWrapper, of[0m
+[0m[[0m[31merror[0m] [0m[0mclass DonutInfoActorSpec extends TestKit(ActorSystem("DonutInfoActorSpec")) with ImplicitSender with DefaultTimeout with FlatSpecLike with BeforeAndAfterAll with Matchers with MustMatchers{[0m
+[0m[[0m[31merror[0m] [0m[0m      ^[0m
+[0m[[0m[31merror[0m] [0m[0mone error found[0m
