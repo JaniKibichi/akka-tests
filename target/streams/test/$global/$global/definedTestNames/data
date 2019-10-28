@@ -1,1 +1,1 @@
-["com.janikibichi.models.CounterActorSpec","com.janikibichi.models.DonutActorFSMSpec","com.janikibichi.models.DonutInfoActorSpec","com.janikibichi.routes.CreateDonutSpec"]
+["com.janikibichi.models.DonutInfoActorSpec","com.janikibichi.models.DonutActorFSMSpec","com.janikibichi.routes.DonutQueryParametersSpec","com.janikibichi.models.CounterActorSpec","com.janikibichi.routes.CreateDonutSpec"]
